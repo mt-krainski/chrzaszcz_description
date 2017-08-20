@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="four_wheels.xacro"/>
+  <xacro:include filename="dagu_arm.xacro"/>
+
+  <joint name="robotArm_to_fourWheelBase" type="fixed">
+    <parent link="base_link"/>
+    <child link="arm_base"/>
+    <origin xyz="-${(base_width/2.0)*0.6} ${(base_length/2.0)*0.8} 0" rpy="0 0 ${pi/2}"/>
+  </joint>
+
+</robot>

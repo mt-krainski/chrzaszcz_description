@@ -1,0 +1,344 @@
+<?xml version="1.0"?>
+<robot name="dagu_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <material name="dark">
+    <color rgba="0.2 0.2 0.2 1"/>
+  </material>
+  <material name="light">
+    <color rgba="0.7 0.7 0.7 1"/>
+  </material>
+
+  <xacro:macro name="generic_cube_inertia" params="width height depth mass">
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia ixx="${(mass/12.0) * (height**2 + depth**2)}" ixy="0.0" ixz="0.0"
+               iyy="${(mass/12.0) * (width**2 + depth**2)}" iyz="0.0"
+               izz="${(mass/12.0) * (width**2 + height**2)}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:include filename="$(find chrzaszcz_description)/urdf/dagu_arm.gazebo" />
+
+  <link name="world"/>
+
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+
+  <xacro:property name="base_width" value="0.02"/>
+  <xacro:property name="base_length" value="0.055"/>
+  <xacro:property name="base_height" value="0.051"/>
+  <xacro:property name="base_mass" value="0.1"/>
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+      <origin xyz="0 0 ${base_height/2.0}"/>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+      <origin xyz="0 0 ${base_height/2.0}"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${base_width}" height="${base_height}" depth="${base_length}" mass="${base_mass}"/>
+  </link>
+
+  <xacro:property name="first_link_height" value="0.035"/>
+  <xacro:property name="first_link_width" value="0.038"/>
+  <xacro:property name="first_link_length" value="0.06"/>
+  <xacro:property name="first_link_XaxisOffset" value="0.017"/>
+  <xacro:property name="first_link_mass" value="0.1"/>
+
+  <link name="first_link">
+    <visual>
+      <geometry>
+        <box size="${first_link_length} ${first_link_width} ${first_link_height}"/>
+      </geometry>
+      <origin xyz="${-(first_link_length/2.0 - first_link_XaxisOffset)} 0 0"/>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${first_link_length} ${first_link_width} ${first_link_height}"/>
+      </geometry>
+      <origin xyz="${-(first_link_length/2.0 - first_link_XaxisOffset)} 0 0"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${first_link_width}" height="${first_link_height}" depth="${first_link_length}" mass="${first_link_mass}"/>
+  </link>
+
+  <joint name="first_to_base" type="revolute">
+    <parent link="base_link"/>
+    <child link="first_link"/>
+    <axis xyz="0 0 1"/>
+    <origin xyz="${(base_length/2.0 - first_link_XaxisOffset)} 0 ${base_height + 0.5*first_link_height}"/>
+    <limit effort="1000.0" lower="${-pi/2.0}" upper="${pi/2.0}" velocity="${pi/5.0}"/>
+  </joint>
+
+  <transmission name="transmission_first_to_base">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="first_to_base">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="motor1">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
+
+  <xacro:property name="second_link_height" value="0.026"/>
+  <xacro:property name="second_link_width" value="0.06"/>
+  <xacro:property name="second_link_length" value="0.106"/>
+  <xacro:property name="second_link_axisOffset" value="${(second_link_length - 0.08)/2.0}"/>
+  <xacro:property name="second_link_mass" value="0.1"/>
+
+  <link name="second_link">
+    <visual>
+      <geometry>
+        <box size="${second_link_length} ${second_link_width} ${second_link_height}"/>
+      </geometry>
+      <origin xyz="${second_link_length/2.0 - second_link_axisOffset} 0 0"/>
+      <material name="light"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${second_link_length} ${second_link_width} ${second_link_height}"/>
+      </geometry>
+      <origin xyz="${second_link_length/2.0 - second_link_axisOffset} 0 0"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${second_link_width}" height="${second_link_height}" depth="${second_link_length}" mass="${second_link_mass}"/>
+  </link>
+
+  <joint name="second_to_first" type="revolute">
+    <parent link="first_link"/>
+    <child link="second_link"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="0 0 0" rpy="0 ${-pi/2.0} 0"/>
+    <limit effort="1000.0" lower="${-pi/2.0}" upper="${pi/2.0}" velocity="${pi/5.0}"/>
+  </joint>
+
+  <transmission name="transmission_second_to_first">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="second_to_first">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <xacro:property name="third_link_height" value="0.03"/>
+  <xacro:property name="third_link_width" value="0.038"/>
+  <xacro:property name="third_link_length" value="0.12"/>
+  <xacro:property name="third_link_rotationAxisOffset" value="0.04"/>
+  <xacro:property name="third_link_linkOffset" value="0.08"/>
+  <xacro:property name="third_link_mass" value="0.1"/>
+
+  <link name="third_link">
+    <visual>
+      <geometry>
+        <box size="${third_link_length} ${third_link_width} ${third_link_height}"/>
+      </geometry>
+      <origin xyz="${third_link_rotationAxisOffset} 0 0"/>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${third_link_length} ${third_link_width} ${third_link_height}"/>
+      </geometry>
+      <origin xyz="${third_link_rotationAxisOffset} 0 0"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${third_link_width}" height="${third_link_height}" depth="${third_link_length}" mass="${third_link_mass}"/>
+  </link>
+
+  <joint name="third_to_second" type="revolute">
+    <parent link="second_link"/>
+    <child link="third_link"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="${third_link_linkOffset} 0 0" rpy="0 0 0"/>
+    <limit effort="1000.0" lower="${-pi/2.0}" upper="${pi/2.0}" velocity="${pi/5.0}"/>
+  </joint>
+
+  <transmission name="transmission_third_to_second">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="third_to_second">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor3">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <xacro:property name="fourth_link_height" value="0.024"/>
+  <xacro:property name="fourth_link_width" value="0.06"/>
+  <xacro:property name="fourth_link_length" value="0.073"/>
+  <xacro:property name="fourth_link_rotationAxisOffset" value="${fourth_link_length/2.0 - 0.0125}"/>
+  <xacro:property name="fourth_link_linkOffset" value="0.08"/>
+  <xacro:property name="fourth_link_mass" value="0.1"/>
+
+  <link name="fourth_link">
+    <visual>
+      <geometry>
+        <box size="${fourth_link_length} ${fourth_link_width} ${fourth_link_height}"/>
+      </geometry>
+      <origin xyz="${fourth_link_rotationAxisOffset} 0 0"/>
+      <material name="dark"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${fourth_link_length} ${fourth_link_width} ${fourth_link_height}"/>
+      </geometry>
+      <origin xyz="${fourth_link_rotationAxisOffset} 0 0"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${fourth_link_width}" height="${fourth_link_height}" depth="${fourth_link_length}" mass="${fourth_link_mass}"/>
+  </link>
+
+  <joint name="fourth_to_third" type="revolute">
+    <parent link="third_link"/>
+    <child link="fourth_link"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="${fourth_link_linkOffset} 0 0" rpy="0 0 0"/>
+    <limit effort="1000.0" lower="${-pi/2.0}" upper="${pi/2.0}" velocity="${pi/5.0}"/>
+  </joint>
+
+  <transmission name="transmission_fourth_to_third">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="fourth_to_third">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor4">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <xacro:property name="fifth_link_height" value="0.01"/>
+  <xacro:property name="fifth_link_width" value="0.036"/>
+  <xacro:property name="fifth_link_length" value="0.073"/>
+  <xacro:property name="fifth_link_rotationAxisOffset" value="0.0"/>
+  <xacro:property name="fifth_link_linkOffset" value="${-(fourth_link_width/2.0 - 0.02)}"/>
+  <xacro:property name="fifth_link_mass" value="0.1"/>
+
+  <link name="fifth_link">
+    <visual>
+      <geometry>
+        <box size="${fifth_link_length} ${fifth_link_width} ${fifth_link_height}"/>
+      </geometry>
+      <origin xyz="${fifth_link_rotationAxisOffset} 0 0"/>
+      <material name="light"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${fifth_link_length} ${fifth_link_width} ${fifth_link_height}"/>
+      </geometry>
+      <origin xyz="${fifth_link_rotationAxisOffset} 0 0"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${fifth_link_width}" height="${fifth_link_height}" depth="${fifth_link_length}" mass="${fifth_link_mass}"/>
+  </link>
+
+  <joint name="fifth_to_fourth" type="revolute">
+    <parent link="fourth_link"/>
+    <child link="fifth_link"/>
+    <axis xyz="1 0 0"/>
+    <origin xyz="${fourth_link_length/2.0 + fifth_link_length/2.0+fourth_link_rotationAxisOffset} ${fifth_link_linkOffset} 0" rpy="0 0 0"/>
+    <limit effort="1000.0" lower="${-pi}" upper="${0}" velocity="${pi/5.0}"/>
+  </joint>
+
+  <transmission name="transmission_fifth_to_fourth">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="fifth_to_fourth">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor5">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <xacro:property name="gripper_height" value="0.007"/>
+  <xacro:property name="gripper_length" value="0.05"/>
+  <xacro:property name="gripper_width" value="0.011"/>
+  <xacro:property name="gripper_mass" value="0.01"/>
+
+  <link name="right_gripper">
+    <visual>
+      <geometry>
+        <box size="${gripper_length} ${gripper_width} ${gripper_height}"/>
+      </geometry>
+      <origin xyz="${gripper_length/2.0} ${gripper_width/2.0} 0"/>
+      <material name="light"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${gripper_length} ${gripper_width} ${gripper_height}"/>
+      </geometry>
+      <origin xyz="${gripper_length/2.0} ${gripper_width/2.0} 0"/>
+      <material name="light"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${gripper_width}" height="${gripper_height}" depth="${gripper_length}" mass="${gripper_mass}"/>
+  </link>
+
+  <joint name="right_gripper_to_fifth_link" type="prismatic">
+    <parent link="fifth_link"/>
+    <child link="right_gripper"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="${fifth_link_length/2.0} 0 0" rpy="0 0 0"/>
+    <limit effort="1000.0" lower="0" upper="0.035" velocity="0.01"/>
+  </joint>
+
+  <transmission name="transmission_right_gripper_to_fifth_link">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="right_gripper_to_fifth_link">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor6">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <link name="left_gripper">
+    <visual>
+      <geometry>
+        <box size="${gripper_length} ${gripper_width} ${gripper_height}"/>
+      </geometry>
+      <origin xyz="${gripper_length/2.0} -${gripper_width/2.0} 0"/>
+      <material name="light"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${gripper_length} ${gripper_width} ${gripper_height}"/>
+      </geometry>
+      <origin xyz="${gripper_length/2.0} -${gripper_width/2.0} 0"/>
+      <material name="light"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${gripper_width}" height="${gripper_height}" depth="${gripper_length}" mass="${gripper_mass}"/>
+  </link>
+
+  <joint name="left_gripper_to_fifth_link" type="prismatic">
+    <parent link="fifth_link"/>
+    <child link="left_gripper"/>
+    <axis xyz="0 1 0"/>
+    <origin xyz="${fifth_link_length/2.0} 0 0" rpy="0 0 0"/>
+    <limit effort="1000.0" lower="0" upper="0.035" velocity="0.01"/>
+    <mimic joint="right_gripper_to_fifth_link" multiplier="-1"/>
+  </joint>
+
+  <transmission name="transmission_left_gripper_to_fifth_link">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="left_gripper_to_fifth_link">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor7">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+</robot>

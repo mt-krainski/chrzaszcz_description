@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot name="dagu_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="generic_cube_inertia" params="width height depth mass">
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia ixx="${(mass/12.0) * (height**2 + depth**2)}" ixy="0.0" ixz="0.0"
+               iyy="${(mass/12.0) * (width**2 + depth**2)}" iyz="0.0"
+               izz="${(mass/12.0) * (width**2 + height**2)}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:property name='cube_wall' value='0.05'/>
+
+  <link name="cube">
+    <visual>
+      <geometry>
+        <box size="${cube_wall} ${cube_wall} ${cube_wall}"/>
+      </geometry>
+      <origin xyz="0 0 ${cube_wall/2.0}"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${cube_wall} ${cube_wall} ${cube_wall}"/>
+      </geometry>
+      <origin xyz="0 0 ${cube_wall/2.0}"/>
+    </collision>
+    <xacro:generic_cube_inertia width="${cube_wall}" height="${cube_wall}" depth="${cube_wall}" mass="0.01"/>
+  </link>
+
+  <gazebo reference="cube">
+    <mu1> 20 </mu1>
+    <mu2> 30 </mu2>
+    <material> Gazebo/White </material>
+  </gazebo>
+
+</robot>
