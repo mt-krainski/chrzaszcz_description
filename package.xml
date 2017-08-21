@@ -40,6 +40,8 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>gazebo_grasp_plugin</run_depend>
   <run_depend>keyboard</run_depend>
+  <run_depend>chrzaszcz</run_depend>
+  <run_depend>gazebo_ros</run_depend>
   <buildtool_depend>catkin</buildtool_depend>
 
 
