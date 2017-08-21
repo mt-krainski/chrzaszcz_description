@@ -12,7 +12,7 @@ chrzaszcz:
   joint2_position_controller:
     type: effort_controllers/JointPositionController
     joint: second_to_first
-    pid: {p: 20.0, i: 0.01, d: 0.01}
+    pid: {p: 40.0, i: 0.01, d: 0.01}
   joint3_position_controller:
     type: effort_controllers/JointPositionController
     joint: third_to_second

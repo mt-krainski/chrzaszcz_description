@@ -16,8 +16,12 @@
 
   <xacro:macro name="add_gazebo_properties_to_wheels" params="posName">
     <gazebo reference="wheel${posName}">
-      <mu1> 20 </mu1>
-      <mu2> 30 </mu2>
+        <mu1 value="20.0" />
+        <mu2 value="10.0" />
+        <kp  value="100000.0" />
+        <kd  value="1.0" />
+        <maxVel  value="100.0" />
+        <minDepth  value="0.0005" />
       <material> Gazebo/DarkGrey </material>
     </gazebo>
   </xacro:macro>
@@ -115,7 +119,7 @@
       <wheelSeparation>${base_width}</wheelSeparation>
       <wheelDiameter>${wheel_radius * 2.0}</wheelDiameter>
       <robotBaseFrame>base_link</robotBaseFrame>
-      <torque>20</torque>
+      <torque>100</torque>
       <topicName>cmd_vel</topicName>
       <broadcastTF>true</broadcastTF>
     </plugin>
