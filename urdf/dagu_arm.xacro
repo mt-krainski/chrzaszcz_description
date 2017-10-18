@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <robot name="dagu_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+  <xacro:property name="PI" value="3.1416"/>
   <!-- <material name="dark">
     <color rgba="0.2 0.2 0.2 1"/>
   </material> -->
@@ -333,5 +334,37 @@
       <mechanicalReduction>-1</mechanicalReduction>
     </actuator>
   </transmission>
+
+  <xacro:property name="camera_size" value="0.02" />
+
+  <link name="arm_camera">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="${camera_size} ${2*camera_size} ${camera_size}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="${camera_size} ${2*camera_size} ${camera_size}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="arm_camera_joint" type="fixed">
+    <axis xyz="0 1 0"/>
+    <origin xyz="0 0 ${camera_size/2 + fifth_link_height/2}" rpy="0 0 0"/>
+    <parent link="fifth_link"/>
+    <child link="arm_camera"/>
+  </joint>
 
 </robot>

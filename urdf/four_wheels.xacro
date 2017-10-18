@@ -105,7 +105,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-    <box size="${camera_size} ${2*camera_size} ${camera_size}"/>
+    <box size="${camera_size} ${2*camera_size} ${2*camera_size}"/>
       </geometry>
       <material name="red"/>
     </visual>
@@ -119,7 +119,7 @@
 
   <joint name="camera_joint" type="fixed">
     <axis xyz="0 1 0"/>
-    <origin xyz="0 ${base_length*0.8/2} ${base_height/2}" rpy="0 0 ${PI/2}"/>
+    <origin xyz="0 ${base_length/2 + camera_size/2} ${base_height/2}" rpy="${PI} 0 ${PI/2}"/>
     <parent link="base_link"/>
     <child link="camera_link"/>
   </joint>
