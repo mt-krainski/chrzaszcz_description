@@ -7,7 +7,10 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp rospy std_msgs geometry_msgs gazebo_grasp_plugin)
+
+# gazebo_grasp_plugin should be added for simulation control...
+
+find_package(catkin REQUIRED roscpp rospy std_msgs geometry_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
